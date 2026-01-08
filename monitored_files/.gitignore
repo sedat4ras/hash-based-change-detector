@@ -1,0 +1,7 @@
+# Python gereksiz dosyalari
+__pycache__/
+*.py[cod]
+
+# Proje ozel dosyalari
+baseline.txt
+monitored_files/

@@ -1,0 +1,112 @@
+import hashlib
+import os
+import time
+
+# --- CONFIGURATION ---
+MONITORED_FOLDER = "monitored_files"
+BASELINE_FILE = "baseline.txt"
+
+def calculate_hash(file_path):
+    """Calculates the SHA-256 hash of a file."""
+    sha256_hash = hashlib.sha256()
+    try:
+        with open(file_path, "rb") as f:
+            # Read file in 4KB chunks to optimize memory usage
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+        return sha256_hash.hexdigest()
+    except FileNotFoundError:
+        return None
+
+def create_baseline():
+    """Scans all files and creates a new baseline file."""
+    # Remove old baseline if exists
+    if os.path.exists(BASELINE_FILE):
+        os.remove(BASELINE_FILE)
+
+    print(f"\n[INFO] Creating baseline from: {MONITORED_FOLDER}...")
+    
+    with open(BASELINE_FILE, "w") as f:
+        for root, dirs, files in os.walk(MONITORED_FOLDER):
+            for file_name in files:
+                file_path = os.path.join(root, file_name)
+                file_hash = calculate_hash(file_path)
+                
+                if file_hash:
+                    # Format: filepath|hash
+                    f.write(f"{file_path}|{file_hash}\n")
+                    print(f"[+] Added to baseline: {file_path}")
+
+    print(f"\n[SUCCESS] Baseline created: {BASELINE_FILE}")
+    print("You can now start monitoring.")
+
+def start_monitoring():
+    """Continuously monitors files and compares them against the baseline."""
+    print(f"\n[INFO] Monitoring started on: {MONITORED_FOLDER}")
+    print("[INFO] Press Ctrl+C to stop...\n")
+    
+    baseline_hashes = {}
+    
+    # Check if baseline exists
+    if not os.path.exists(BASELINE_FILE):
+        print("[ERROR] Baseline file not found! Please run Option 1 first.")
+        return
+
+    # Load baseline into memory (Dictionary)
+    with open(BASELINE_FILE, "r") as f:
+        for line in f:
+            parts = line.strip().split("|")
+            if len(parts) == 2:
+                file_path, file_hash = parts
+                baseline_hashes[file_path] = file_hash
+
+    # Infinite Monitoring Loop
+    try:
+        while True:
+            time.sleep(1) # Wait 1 second before next scan
+            
+            # Scan the folder
+            for root, dirs, files in os.walk(MONITORED_FOLDER):
+                for file_name in files:
+                    file_path = os.path.join(root, file_name)
+                    current_hash = calculate_hash(file_path)
+                    
+                    # Scenario 1: File exists in baseline -> Check for modification
+                    if file_path in baseline_hashes:
+                        stored_hash = baseline_hashes[file_path]
+                        
+                        if current_hash != stored_hash:
+                            print(f"\n[!!! ALERT !!!] FILE CHANGED: {file_path}")
+                            print(f"   Old Hash: {stored_hash}")
+                            print(f"   New Hash: {current_hash}")
+                            
+                            # Update the known hash to avoid spamming the alert
+                            # (Optional: remove this line if you want continuous alerts)
+                            baseline_hashes[file_path] = current_hash 
+
+                    # Scenario 2: File is NOT in baseline -> It is a NEW file
+                    else:
+                        print(f"\n[!!! ALERT !!!] NEW FILE DETECTED: {file_path}")
+                        # Add to temporary memory to avoid spamming
+                        baseline_hashes[file_path] = current_hash
+
+    except KeyboardInterrupt:
+        print("\n[INFO] Monitoring stopped by user.")
+
+# --- MAIN MENU ---
+if __name__ == "__main__":
+    print("-" * 30)
+    print("FILE INTEGRITY MONITOR (FIM)")
+    print("-" * 30)
+    print("1. Create New Baseline (Setup)")
+    print("2. Start Monitoring (Defend)")
+    print("-" * 30)
+    
+    choice = input("Select an option (1 or 2): ")
+    
+    if choice == "1":
+        create_baseline()
+    elif choice == "2":
+        start_monitoring()
+    else:
+        print("Invalid choice. Exiting.")
