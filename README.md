@@ -1,4 +1,4 @@
-# File Integrity Monitor (FIM) 🛡️
+# File Integrity Monitor (FIM) 
 
 A lightweight, Python-based cybersecurity tool that monitors file integrity in real-time. It calculates SHA-256 hashes of files to create a baseline and alerts the user if any file is modified, deleted, or created.
 
@@ -7,10 +7,10 @@ A lightweight, Python-based cybersecurity tool that monitors file integrity in r
 - **Baseline Creation:** Scans a target directory to create a "known-good" state.
 - **Real-Time Monitoring:** Continuously checks for changes against the baseline.
 - **Instant Alerts:** Notifies the user immediately upon detection of:
-  - File Modifications 📝
-  - New File Creations 📄
-  - File Deletions 🗑️
-
+  - File Modifications 
+  - New File Creations 
+  - File Deletions
+  - 
 ##  Installation
 
 1. Clone the repository:
