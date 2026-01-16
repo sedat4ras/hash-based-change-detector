@@ -2,10 +2,7 @@
 
 A lightweight, Python-based cybersecurity tool that monitors file integrity in real-time. It calculates SHA-256 hashes of files to create a baseline and alerts the user if any file is modified, deleted, or created.
 
-![Python](https://img.shields.io/badge/Python-3.x-blue?style=flat&logo=python)
-![Security](https://img.shields.io/badge/Security-Blue%20Team-red)
-
-## 🚀 Features
+##  Features
 - **SHA-256 Hashing:** Uses secure hashing algorithms to verify file integrity.
 - **Baseline Creation:** Scans a target directory to create a "known-good" state.
 - **Real-Time Monitoring:** Continuously checks for changes against the baseline.
@@ -14,7 +11,7 @@ A lightweight, Python-based cybersecurity tool that monitors file integrity in r
   - New File Creations 📄
   - File Deletions 🗑️
 
-## ⚙️ Installation
+##  Installation
 
 1. Clone the repository:
    ```bash
