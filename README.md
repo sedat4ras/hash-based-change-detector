@@ -11,7 +11,10 @@ A lightweight, Python-based cybersecurity tool that monitors file integrity in r
   - File Modifications 
   - New File Creations 
   - File Deletions
-  
+*
+*
+*
+*
 ##  Installation
 
 * Clone the repository:
@@ -19,18 +22,18 @@ A lightweight, Python-based cybersecurity tool that monitors file integrity in r
 git clone [https://github.com/sedat4ras/hash-based-change-detector.git](https://github.com/sedat4ras/hash-based-change-detector.git)
 cd hash-based-change-detector
 ```
-
-
+*
+*
 * Create a folder to moonitor:
 ```
 mkdir monitored_files
 ```
-
-
+*
+*
 ## Usage: 
 To ensure the tool is working correctly, follow these steps to create a baseline and simulate an integrity breach.
-
-
+*
+*
 **1-) Setup the Environment** 
 First, ensure you are in the project directory and your virtual environment is active:
 
@@ -39,11 +42,10 @@ source venv/bin/activate  # On macOS/Linux
 # or
 .\venv\Scripts\activate   # On Windows
 ```
-
-
-
-
-
+*
+*
+*
+*
 **2-) Create a Baseline (This base line will be the "Good" state of your file**
 Run the script and select Option 1. This option generates a baseline.txt file containing the original SHA-256 hashes of your files.
 
@@ -51,10 +53,10 @@ Run the script and select Option 1. This option generates a baseline.txt file co
 python3 main.py
 # Select Option 1
 ```
-
-
-
-
+*
+*
+*
+*
 **3-) Start Monitoring**
 After creating the baseline, you need to restart the script or stay in the menu to initiate the protector. Choose Option 2 to enter the real-time monitoring loop.
 
@@ -64,22 +66,20 @@ python3 main.py
 ```
 
 Once selected, the tool will enter a continuous loop, scanning the monitored_files directory every second. You will see a message like "Monitoring files..." indicating the guard is active. Do not close this terminal window, as it is now your active security monitor.
-
-
-
-
-
+*
+*
+*
+*
 **4-) Simulate an Attack**
 Open a second terminal window, navigate to the project folder, and modify a file to trigger an alert:
 
 ```
 echo "Unauthorized change" > monitored_files/passwords.txt
 ```
-
-
-
-
-
+*
+*
+*
+*
 **Verify the Alert**
 Go back to your first terminal. You should see a high-visibility alert: 
 
@@ -88,19 +88,17 @@ Go back to your first terminal. You should see a high-visibility alert:
 
 
 ![Alert Message Snapshot](./alert-message.png)
-
-
-
-
-
-
+*
+*
+*
+*
 **Troubleshooting**
+
 If you encounter issues while running the tool, check the solutions below:
-
-
-
-
-
+*
+*
+*
+*
 **1. "Permission Denied" Error (macOS/Linux)**
 
 If the tool cannot read files or you cannot modify files in the monitored_files folder:
@@ -109,10 +107,10 @@ Solution: Grant ownership to your current user:
 ```
 sudo chown -R $(whoami) .
 ```
-
-
-
-
+*
+*
+*
+*
 **3. No Alert Triggered**
 
 If you modify a file but don't see an alert:
@@ -121,19 +119,16 @@ If you modify a file but don't see an alert:
 *Solution B: Ensure you are modifying a file inside the monitored_files folder.
 
 *Solution C: Check if you created a baseline (Option 1) before starting the monitor.
-
-
-
-
-
+*
+*
+*
+*
 **Disclaimer! 
 This tool is developed for educational purposes and internal security testing only. Always ensure you have explicit permission before monitoring systems or files that do not belong to you.**
-
-
-
-
-
-
+*
+*
+*
+*
 If you have any questions or suggestions to improve this tool, feel free to reach out:
 
 GitHub: https://github.com/sedat4ras
