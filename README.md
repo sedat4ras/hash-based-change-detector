@@ -13,15 +13,19 @@ A lightweight, Python-based cybersecurity tool that monitors file integrity in r
   - 
 ##  Installation
 
-1. Clone the repository:
+## 1. Clone the repository:
    ```bash
-   git clone [https://github.com/sedat4ras/hash-based-change-detector.git](https://github.com/sedat4ras/hash-based-change-detector.git)
-   cd hash-based-change-detector
-
-   2. Create a folder to moonitor:
-     mkdir monitored_files
-
-Usage: python main.py
+git clone [https://github.com/sedat4ras/hash-based-change-detector.git](https://github.com/sedat4ras/hash-based-change-detector.git)
+cd hash-based-change-detector
+   ```
+## 2. Create a folder to moonitor:
+```
+mkdir monitored_files
+```
+## 3. Usage: 
+```
+python main.py
+```
 
 Step 1: Setup (Create Baseline)
 Select Option 1 from the menu. The tool will scan the monitored_files folder and generate a baseline.txt file containing the initial file hashes.
@@ -35,8 +39,7 @@ Exp Alert:
    Old Hash: a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
    New Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 
-   Disclaimer
+Disclaimer
 This tool is developed for educational purposes and internal security testing.
 
-Produced for training purposes.
 
