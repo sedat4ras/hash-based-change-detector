@@ -69,7 +69,7 @@ Go back to your first terminal. You should see a high-visibility alert:
 **Troubleshooting**
 If you encounter issues while running the tool, check the solutions below:
 
-** 1. "Permission Denied" Error (macOS/Linux) **
+**1. "Permission Denied" Error (macOS/Linux)**
 
 If the tool cannot read files or you cannot modify files in the monitored_files folder:
 Solution: Grant ownership to your current user:
@@ -78,7 +78,7 @@ Solution: Grant ownership to your current user:
 sudo chown -R $(whoami) .
 ```
 
-** 3. No Alert Triggered **
+**3. No Alert Triggered**
 
 If you modify a file but don't see an alert:
 *Solution A: Make sure you selected Option 2 (Monitoring) and the terminal says "Monitoring...".
