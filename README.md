@@ -39,7 +39,7 @@ Exp Alert:
    Old Hash: a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
    New Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 
-   {Allert Message}(
+   (hash-based-change-detector/allert-message.png)
 
 Disclaimer
 This tool is developed for educational purposes and internal security testing.
