@@ -38,5 +38,5 @@ Exp Alert:
    Disclaimer
 This tool is developed for educational purposes and internal security testing.
 
-Developed by sedat4ras
+Produced for training purposes.
 
