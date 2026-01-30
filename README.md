@@ -13,35 +13,52 @@ A lightweight, Python-based cybersecurity tool that monitors file integrity in r
   - 
 ##  Installation
 
-## 1. Clone the repository:
-   ```bash
+* Clone the repository:
+```bash
 git clone [https://github.com/sedat4ras/hash-based-change-detector.git](https://github.com/sedat4ras/hash-based-change-detector.git)
 cd hash-based-change-detector
-   ```
-## 2. Create a folder to moonitor:
+```
+* Create a folder to moonitor:
 ```
 mkdir monitored_files
 ```
-## 3. Usage: 
+## Usage: 
+To ensure the tool is working correctly, follow these steps to create a baseline and simulate an integrity breach.
+
+**1-) Setup the Environment** 
+First, ensure you are in the project directory and your virtual environment is active:
+
 ```
-python main.py
+source venv/bin/activate  # On macOS/Linux
+# or
+.\venv\Scripts\activate   # On Windows
 ```
 
-Step 1: Setup (Create Baseline)
-Select Option 1 from the menu. The tool will scan the monitored_files folder and generate a baseline.txt file containing the initial file hashes.
+**2-) Create a Baseline (This base line will be the "Good" state of your file**
+Run the script and select Option 1. This option generates a baseline.txt file containing the original SHA-256 hashes of your files.
 
-Step 2: Defense (Start Monitoring)
-Select Option 2 to begin the monitoring loop. The tool will check the files every second.
+```
+python3 main.py
+# Select Option 1
+```
+**3-) Start Monitoring**
+After creating the baseline, you need to restart the script or stay in the menu to initiate the protector. Choose Option 2 to enter the real-time monitoring loop.
 
-Exp Alert:
+```
+python3 main.py
+# Type '2' and press Enter
+```
 
+Once selected, the tool will enter a continuous loop, scanning the monitored_files directory every second. You will see a message like "Monitoring files..." indicating the guard is active. Do not close this terminal window, as it is now your active security monitor.
+
+**4-) Simulate an Attack**
+Open a second terminal window, navigate to the project folder, and modify a file to trigger an alert:
+
+```
+echo "Unauthorized change" > monitored_files/passwords.txt
+```
+
+**Verify the Alert**
+Go back to your first terminal. You should see a high-visibility alert: 
 [!!! ALERT !!!] FILE CHANGED: monitored_files/passwords.txt
-   Old Hash: a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
-   New Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-
- ![Alert Message Snapshot](./allert-message.png)
-
-Disclaimer
-This tool is developed for educational purposes and internal security testing.
-
-
+![Alert Message Snapshot](./alert-message.png)
