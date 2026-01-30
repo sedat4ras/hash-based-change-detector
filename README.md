@@ -15,6 +15,7 @@ A lightweight, Python-based cybersecurity tool that monitors file integrity in r
 *
 *
 *
+
 ##  Installation
 
 * Clone the repository:
@@ -24,16 +25,19 @@ cd hash-based-change-detector
 ```
 *
 *
+
 * Create a folder to moonitor:
 ```
 mkdir monitored_files
 ```
 *
 *
+
 ## Usage: 
 To ensure the tool is working correctly, follow these steps to create a baseline and simulate an integrity breach.
 *
 *
+
 **1-) Setup the Environment** 
 First, ensure you are in the project directory and your virtual environment is active:
 
@@ -46,6 +50,7 @@ source venv/bin/activate  # On macOS/Linux
 *
 *
 *
+
 **2-) Create a Baseline (This base line will be the "Good" state of your file**
 Run the script and select Option 1. This option generates a baseline.txt file containing the original SHA-256 hashes of your files.
 
@@ -57,6 +62,7 @@ python3 main.py
 *
 *
 *
+
 **3-) Start Monitoring**
 After creating the baseline, you need to restart the script or stay in the menu to initiate the protector. Choose Option 2 to enter the real-time monitoring loop.
 
@@ -70,6 +76,7 @@ Once selected, the tool will enter a continuous loop, scanning the monitored_fil
 *
 *
 *
+
 **4-) Simulate an Attack**
 Open a second terminal window, navigate to the project folder, and modify a file to trigger an alert:
 
@@ -80,6 +87,7 @@ echo "Unauthorized change" > monitored_files/passwords.txt
 *
 *
 *
+
 **Verify the Alert**
 Go back to your first terminal. You should see a high-visibility alert: 
 
@@ -92,6 +100,7 @@ Go back to your first terminal. You should see a high-visibility alert:
 *
 *
 *
+
 **Troubleshooting**
 
 If you encounter issues while running the tool, check the solutions below:
