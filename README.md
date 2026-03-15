@@ -1,149 +1,112 @@
-# File Integrity Monitor (FIM) 
+# Hash-Based Change Detector
 
-A lightweight, Python-based cybersecurity tool that monitors file integrity in real-time. It calculates SHA-256 hashes of files to create a baseline and alerts the user if any file is modified, deleted, or created.
+> A real-time file integrity monitoring (FIM) tool that uses SHA-256 hashing to detect unauthorized modifications, creations, and deletions in monitored directories.
 
-##  Features
+[![Python](https://img.shields.io/badge/Python-3.x-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![SHA-256](https://img.shields.io/badge/Hash-SHA--256-green?style=flat-square)]()
+[![Purpose](https://img.shields.io/badge/Purpose-File_Integrity_Monitoring-orange?style=flat-square)]()
+[![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square)]()
 
-- **SHA-256 Hashing:** Uses secure hashing algorithms to verify file integrity.
-- **Baseline Creation:** Scans a target directory to create a "known-good" state.
-- **Real-Time Monitoring:** Continuously checks for changes against the baseline.
-- **Instant Alerts:** Notifies the user immediately upon detection of:
-  - File Modifications 
-  - New File Creations 
-  - File Deletions
-*
-*
-*
-*
+---
 
-##  Installation
+## Overview
 
-* Clone the repository:
+File Integrity Monitoring is a core security control recommended by frameworks like PCI DSS and NIST. This tool implements FIM from scratch — it creates a cryptographic baseline of a directory's "known-good" state, then continuously monitors for deviations that could indicate unauthorized access, malware, or configuration tampering.
+
+## How It Works
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                      FILE INTEGRITY MONITOR                      │
+├──────────────────────┬───────────────────────────────────────────┤
+│                      │                                           │
+│   BASELINE MODE      │         MONITORING MODE                   │
+│   (Option 1)         │         (Option 2)                        │
+│                      │                                           │
+│   Scan Directory     │    ┌─── Compare Against Baseline ───┐    │
+│        │             │    │                                 │    │
+│        ▼             │    │  Hash Match    → No Action      │    │
+│   Calculate SHA-256  │    │  Hash Mismatch → MODIFIED Alert │    │
+│   for each file      │    │  New File      → CREATED Alert  │    │
+│        │             │    │  Missing File  → DELETED Alert  │    │
+│        ▼             │    │                                 │    │
+│   Save baseline.txt  │    └─────── Loop (every 1s) ────────┘    │
+│                      │                                           │
+└──────────────────────┴───────────────────────────────────────────┘
+```
+
+## Detection Capabilities
+
+| Event | Detection Method | Alert Level |
+|-------|-----------------|-------------|
+| **File Modified** | SHA-256 hash mismatch against baseline | `[!!! ALERT !!!]` |
+| **File Created** | New file not present in baseline | `[!!! ALERT !!!]` |
+| **File Deleted** | Baseline entry with no matching file | `[!!! ALERT !!!]` |
+
+## Quick Start
+
 ```bash
-git clone [https://github.com/sedat4ras/hash-based-change-detector.git](https://github.com/sedat4ras/hash-based-change-detector.git)
+git clone https://github.com/sedat4ras/hash-based-change-detector.git
 cd hash-based-change-detector
-```
-*
-*
 
-* Create a folder to moonitor:
-```
+# Create a directory to monitor
 mkdir monitored_files
+echo "sensitive data" > monitored_files/passwords.txt
 ```
-*
-*
 
-## Usage: 
-To ensure the tool is working correctly, follow these steps to create a baseline and simulate an integrity breach.
-*
-*
+### Step 1 — Create Baseline
 
-**1-) Setup the Environment** 
-First, ensure you are in the project directory and your virtual environment is active:
-
-```
-source venv/bin/activate  # On macOS/Linux
-# or
-.\venv\Scripts\activate   # On Windows
-```
-*
-*
-*
-*
-
-**2-) Create a Baseline (This base line will be the "Good" state of your file**
-Run the script and select Option 1. This option generates a baseline.txt file containing the original SHA-256 hashes of your files.
-
-```
+```bash
 python3 main.py
 # Select Option 1
 ```
-*
-*
-*
-*
 
-**3-) Start Monitoring**
-After creating the baseline, you need to restart the script or stay in the menu to initiate the protector. Choose Option 2 to enter the real-time monitoring loop.
+This scans `monitored_files/` and generates `baseline.txt` containing the SHA-256 hash of every file.
 
-```
+### Step 2 — Start Monitoring
+
+```bash
 python3 main.py
-# Type '2' and press Enter
+# Select Option 2
 ```
 
-Once selected, the tool will enter a continuous loop, scanning the monitored_files directory every second. You will see a message like "Monitoring files..." indicating the guard is active. Do not close this terminal window, as it is now your active security monitor.
-*
-*
-*
-*
+The tool enters a continuous monitoring loop, scanning every second for changes.
 
-**4-) Simulate an Attack**
-Open a second terminal window, navigate to the project folder, and modify a file to trigger an alert:
+### Step 3 — Test Detection
 
-```
+In a **second terminal**, simulate an unauthorized change:
+
+```bash
 echo "Unauthorized change" > monitored_files/passwords.txt
 ```
-*
-*
-*
-*
 
-**Verify the Alert**
-Go back to your first terminal. You should see a high-visibility alert: 
+The monitor will immediately display:
 
-
+```
 [!!! ALERT !!!] FILE CHANGED: monitored_files/passwords.txt
-
-
-![Alert Message Snapshot](./alert-message.png)
-*
-*
-*
-*
-
-**Troubleshooting**
-
-If you encounter issues while running the tool, check the solutions below:
-*
-*
-*
-*
-
-**1. "Permission Denied" Error (macOS/Linux)**
-
-If the tool cannot read files or you cannot modify files in the monitored_files folder:
-Solution: Grant ownership to your current user:
-
 ```
-sudo chown -R $(whoami) .
-```
-*
-*
-*
-*
 
-**3. No Alert Triggered**
+![Alert Message](./alert-message.png)
 
-If you modify a file but don't see an alert:
-*Solution A: Make sure you selected Option 2 (Monitoring) and the terminal says "Monitoring...".
+## Technical Details
 
-*Solution B: Ensure you are modifying a file inside the monitored_files folder.
+- **Hash Algorithm:** SHA-256 (cryptographically secure, collision-resistant)
+- **Scan Interval:** 1 second continuous loop
+- **Baseline Storage:** Plain-text file mapping `filepath → hash`
+- **Dependencies:** Zero — uses only Python standard library (`hashlib`, `os`, `time`)
 
-*Solution C: Check if you created a baseline (Option 1) before starting the monitor.
-*
-*
-*
-*
+## Troubleshooting
 
-**Disclaimer! 
-This tool is developed for educational purposes and internal security testing only. Always ensure you have explicit permission before monitoring systems or files that do not belong to you.**
-*
-*
-*
-*
+| Issue | Solution |
+|-------|---------|
+| Permission Denied (macOS/Linux) | `sudo chown -R $(whoami) .` |
+| No Alert Triggered | Ensure monitoring mode (Option 2) is active and files are inside `monitored_files/` |
+| Baseline Missing | Run Option 1 before starting the monitor |
 
-If you have any questions or suggestions to improve this tool, feel free to reach out:
+## Disclaimer
 
-GitHub: https://github.com/sedat4ras
+This tool is developed for **educational purposes and internal security testing only**. Always ensure you have explicit permission before monitoring systems or files that do not belong to you.
 
-E-Mail: sudo@sedataras.com
+## Contact
+
+GitHub: [sedat4ras](https://github.com/sedat4ras) | Email: sudo@sedataras.com
