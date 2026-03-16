@@ -1,112 +1,113 @@
-import hashlib
-import os
-import time
+"""File Integrity Monitor (FIM) — CLI entry point.
 
-# --- CONFIGURATION ---
-MONITORED_FOLDER = "monitored_files"
-BASELINE_FILE = "baseline.txt"
+Usage:
+    python main.py setup              Create a new baseline
+    python main.py monitor            Start real-time monitoring
+    python main.py report             View forensic event summary
+    python main.py                    Interactive legacy menu
+"""
 
-def calculate_hash(file_path):
-    """Calculates the SHA-256 hash of a file."""
-    sha256_hash = hashlib.sha256()
-    try:
-        with open(file_path, "rb") as f:
-            # Read file in 4KB chunks to optimize memory usage
-            for byte_block in iter(lambda: f.read(4096), b""):
-                sha256_hash.update(byte_block)
-        return sha256_hash.hexdigest()
-    except FileNotFoundError:
-        return None
+import argparse
+import sys
 
-def create_baseline():
-    """Scans all files and creates a new baseline file."""
-    # Remove old baseline if exists
-    if os.path.exists(BASELINE_FILE):
-        os.remove(BASELINE_FILE)
+from fim import __version__
+from fim.baseline import create_baseline
+from fim.monitor import start_monitoring
+from fim.reporter import generate_report
 
-    print(f"\n[INFO] Creating baseline from: {MONITORED_FOLDER}...")
-    
-    with open(BASELINE_FILE, "w") as f:
-        for root, dirs, files in os.walk(MONITORED_FOLDER):
-            for file_name in files:
-                file_path = os.path.join(root, file_name)
-                file_hash = calculate_hash(file_path)
-                
-                if file_hash:
-                    # Format: filepath|hash
-                    f.write(f"{file_path}|{file_hash}\n")
-                    print(f"[+] Added to baseline: {file_path}")
+# --- DEFAULTS ---
+DEFAULT_FOLDER = "monitored_files"
+DEFAULT_BASELINE = "baseline.txt"
+DEFAULT_LOG_DIR = "logs"
 
-    print(f"\n[SUCCESS] Baseline created: {BASELINE_FILE}")
-    print("You can now start monitoring.")
 
-def start_monitoring():
-    """Continuously monitors files and compares them against the baseline."""
-    print(f"\n[INFO] Monitoring started on: {MONITORED_FOLDER}")
-    print("[INFO] Press Ctrl+C to stop...\n")
-    
-    baseline_hashes = {}
-    
-    # Check if baseline exists
-    if not os.path.exists(BASELINE_FILE):
-        print("[ERROR] Baseline file not found! Please run Option 1 first.")
-        return
-
-    # Load baseline into memory (Dictionary)
-    with open(BASELINE_FILE, "r") as f:
-        for line in f:
-            parts = line.strip().split("|")
-            if len(parts) == 2:
-                file_path, file_hash = parts
-                baseline_hashes[file_path] = file_hash
-
-    # Infinite Monitoring Loop
-    try:
-        while True:
-            time.sleep(1) # Wait 1 second before next scan
-            
-            # Scan the folder
-            for root, dirs, files in os.walk(MONITORED_FOLDER):
-                for file_name in files:
-                    file_path = os.path.join(root, file_name)
-                    current_hash = calculate_hash(file_path)
-                    
-                    # Scenario 1: File exists in baseline -> Check for modification
-                    if file_path in baseline_hashes:
-                        stored_hash = baseline_hashes[file_path]
-                        
-                        if current_hash != stored_hash:
-                            print(f"\n[!!! ALERT !!!] FILE CHANGED: {file_path}")
-                            print(f"   Old Hash: {stored_hash}")
-                            print(f"   New Hash: {current_hash}")
-                            
-                            # Update the known hash to avoid spamming the alert
-                            # (Optional: remove this line if you want continuous alerts)
-                            baseline_hashes[file_path] = current_hash 
-
-                    # Scenario 2: File is NOT in baseline -> It is a NEW file
-                    else:
-                        print(f"\n[!!! ALERT !!!] NEW FILE DETECTED: {file_path}")
-                        # Add to temporary memory to avoid spamming
-                        baseline_hashes[file_path] = current_hash
-
-    except KeyboardInterrupt:
-        print("\n[INFO] Monitoring stopped by user.")
-
-# --- MAIN MENU ---
-if __name__ == "__main__":
-    print("-" * 30)
-    print("FILE INTEGRITY MONITOR (FIM)")
-    print("-" * 30)
+def legacy_menu() -> None:
+    """Original interactive menu for backward compatibility."""
+    print("-" * 40)
+    print(f"FILE INTEGRITY MONITOR (FIM) v{__version__}")
+    print("-" * 40)
     print("1. Create New Baseline (Setup)")
     print("2. Start Monitoring (Defend)")
-    print("-" * 30)
-    
-    choice = input("Select an option (1 or 2): ")
-    
+    print("3. View Event Report (Forensics)")
+    print("-" * 40)
+
+    choice = input("Select an option (1, 2 or 3): ")
+
     if choice == "1":
-        create_baseline()
+        create_baseline(DEFAULT_FOLDER, DEFAULT_BASELINE)
     elif choice == "2":
-        start_monitoring()
+        start_monitoring(DEFAULT_FOLDER, DEFAULT_BASELINE, DEFAULT_LOG_DIR)
+    elif choice == "3":
+        generate_report(DEFAULT_LOG_DIR)
     else:
         print("Invalid choice. Exiting.")
+
+
+def main() -> None:
+    """Parse CLI arguments and dispatch commands."""
+    parser = argparse.ArgumentParser(
+        description="File Integrity Monitor (FIM) — detect file tampering in real time",
+        prog="fim",
+    )
+    parser.add_argument(
+        "--version", action="version", version=f"FIM v{__version__}"
+    )
+
+    subparsers = parser.add_subparsers(dest="command")
+
+    # setup
+    sp = subparsers.add_parser("setup", help="Create a new baseline")
+    sp.add_argument(
+        "--folder", default=DEFAULT_FOLDER,
+        help=f"Directory to scan (default: {DEFAULT_FOLDER})",
+    )
+    sp.add_argument(
+        "--baseline", default=DEFAULT_BASELINE,
+        help=f"Baseline output file (default: {DEFAULT_BASELINE})",
+    )
+
+    # monitor
+    mp = subparsers.add_parser("monitor", help="Start real-time monitoring")
+    mp.add_argument(
+        "--folder", default=DEFAULT_FOLDER,
+        help=f"Directory to monitor (default: {DEFAULT_FOLDER})",
+    )
+    mp.add_argument(
+        "--baseline", default=DEFAULT_BASELINE,
+        help=f"Baseline file to use (default: {DEFAULT_BASELINE})",
+    )
+    mp.add_argument(
+        "--log-dir", default=DEFAULT_LOG_DIR,
+        help=f"Event log directory (default: {DEFAULT_LOG_DIR})",
+    )
+    mp.add_argument(
+        "--interval", type=float, default=1.0,
+        help="Scan interval in seconds (default: 1.0)",
+    )
+
+    # report
+    rp = subparsers.add_parser("report", help="View forensic event summary")
+    rp.add_argument(
+        "--log-dir", default=DEFAULT_LOG_DIR,
+        help=f"Event log directory (default: {DEFAULT_LOG_DIR})",
+    )
+
+    args = parser.parse_args()
+
+    # No subcommand → fall back to interactive menu
+    if args.command is None:
+        legacy_menu()
+        return
+
+    if args.command == "setup":
+        create_baseline(args.folder, args.baseline)
+    elif args.command == "monitor":
+        start_monitoring(
+            args.folder, args.baseline, args.log_dir, args.interval,
+        )
+    elif args.command == "report":
+        generate_report(args.log_dir)
+
+
+if __name__ == "__main__":
+    main()
