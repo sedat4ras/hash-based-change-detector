@@ -35,7 +35,7 @@ class TestEventLogger:
             EVENT_MODIFIED, "file.txt", "oldhash", "newhash", 2048,
         )
         expected_keys = {"timestamp", "event_type", "file_path",
-                         "old_hash", "new_hash", "file_size"}
+                         "old_hash", "new_hash", "file_size", "severity"}
         assert set(event.keys()) == expected_keys
 
     def test_multiple_events_appended(self, log_dir):

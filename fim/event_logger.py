@@ -52,6 +52,7 @@ class EventLogger:
         old_hash: str | None = None,
         new_hash: str | None = None,
         file_size: int | None = None,
+        severity: str = "NORMAL",
     ) -> dict:
         """Record a single integrity event.
 
@@ -61,6 +62,7 @@ class EventLogger:
             old_hash: Previous hash (from baseline). None for created files.
             new_hash: Current hash (from disk). None for deleted files.
             file_size: Current file size in bytes. None for deleted files.
+            severity: CRITICAL or NORMAL — based on file pattern matching.
 
         Returns:
             The event dict that was logged.
@@ -72,6 +74,7 @@ class EventLogger:
             "old_hash": old_hash,
             "new_hash": new_hash,
             "file_size": file_size,
+            "severity": severity,
         }
 
         log_path = self._get_log_path()

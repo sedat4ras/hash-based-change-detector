@@ -13,7 +13,7 @@ class TestSingleScan:
         baseline = create_baseline(sample_dir, baseline_file, verbose=False)
         logger = EventLogger(log_dir=log_dir)
 
-        _run_single_scan(sample_dir, baseline, logger)
+        _run_single_scan([sample_dir], baseline, logger)
 
         events = logger.read_all_events()
         assert len(events) == 0
@@ -28,7 +28,7 @@ class TestSingleScan:
         with open(file1, "w") as f:
             f.write("Modified content")
 
-        _run_single_scan(sample_dir, baseline, logger)
+        _run_single_scan([sample_dir], baseline, logger)
 
         events = logger.read_all_events()
         assert len(events) == 1
@@ -45,7 +45,7 @@ class TestSingleScan:
         with open(new_file, "w") as f:
             f.write("I am new")
 
-        _run_single_scan(sample_dir, baseline, logger)
+        _run_single_scan([sample_dir], baseline, logger)
 
         events = logger.read_all_events()
         assert len(events) == 1
@@ -61,7 +61,7 @@ class TestSingleScan:
         file2 = os.path.join(sample_dir, "file2.txt")
         os.remove(file2)
 
-        _run_single_scan(sample_dir, baseline, logger)
+        _run_single_scan([sample_dir], baseline, logger)
 
         events = logger.read_all_events()
         assert len(events) == 1
@@ -77,7 +77,7 @@ class TestSingleScan:
         os.remove(file2)
 
         assert file2 in baseline
-        _run_single_scan(sample_dir, baseline, logger)
+        _run_single_scan([sample_dir], baseline, logger)
         assert file2 not in baseline
 
     def test_no_repeat_alerts(self, sample_dir, baseline_file, log_dir):
@@ -90,12 +90,12 @@ class TestSingleScan:
         with open(file1, "w") as f:
             f.write("Changed once")
 
-        _run_single_scan(sample_dir, baseline, logger)
+        _run_single_scan([sample_dir], baseline, logger)
         events1 = logger.read_all_events()
         assert len(events1) == 1
 
         # Second scan — no more changes
-        _run_single_scan(sample_dir, baseline, logger)
+        _run_single_scan([sample_dir], baseline, logger)
         events2 = logger.read_all_events()
         assert len(events2) == 1  # Still just 1, no repeat
 
@@ -118,7 +118,7 @@ class TestSingleScan:
         with open(new_file, "w") as f:
             f.write("New file")
 
-        _run_single_scan(sample_dir, baseline, logger)
+        _run_single_scan([sample_dir], baseline, logger)
 
         events = logger.read_all_events()
         types = {e["event_type"] for e in events}
@@ -133,7 +133,7 @@ class TestSingleScan:
         with open(file1, "w") as f:
             f.write("New content here")
 
-        _run_single_scan(sample_dir, baseline, logger)
+        _run_single_scan([sample_dir], baseline, logger)
 
         events = logger.read_all_events()
         assert events[0]["file_size"] is not None
@@ -148,7 +148,7 @@ class TestSingleScan:
         old_hash = baseline[file1]
         os.remove(file1)
 
-        _run_single_scan(sample_dir, baseline, logger)
+        _run_single_scan([sample_dir], baseline, logger)
 
         events = logger.read_all_events()
         assert events[0]["old_hash"] == old_hash
