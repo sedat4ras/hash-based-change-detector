@@ -1,6 +1,6 @@
 # Hash-Based Change Detector
 
-> A real-time file integrity monitoring (FIM) tool that uses SHA-256 hashing to detect unauthorized modifications, creations, and deletions — with forensic audit trail, rule-based filtering, and severity classification.
+> A real-time file integrity monitoring (FIM) tool that uses SHA-256 hashing to detect unauthorized modifications, creations, and deletions, with a forensic audit trail, rule-based filtering, and severity classification.
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![SHA-256](https://img.shields.io/badge/Hash-SHA--256-green?style=flat-square)]()
@@ -11,7 +11,7 @@
 
 ## Overview
 
-File Integrity Monitoring is a core security control recommended by frameworks like PCI DSS and NIST. This tool implements FIM from scratch — it creates a cryptographic baseline of a directory's "known-good" state, then continuously monitors for deviations that could indicate unauthorized access, malware, or configuration tampering.
+File Integrity Monitoring is a core security control recommended by frameworks like PCI DSS and NIST. This tool implements FIM from scratch: it creates a cryptographic baseline of a directory's "known-good" state, then continuously monitors for deviations that could indicate unauthorized access, malware, or configuration tampering.
 
 Every event is logged to structured JSON for forensic analysis and SIEM integration.
 
